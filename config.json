@@ -1,0 +1,10 @@
+{
+	"anki-collection": "/home/jacob/anki-collection/",
+	"deck": "Parent",
+
+	"hint-one-liner": "Unix command",
+	"tags-one-liner": ["Unix::Command"],
+
+	"hint-option-description": "Unix {page} option",
+	"tags-option-description": ["Unix::Command::Option"]
+}
