@@ -5,7 +5,6 @@ import urllib.request
 import os.path
 import gzip
 import argparse
-import re
 
 import bs4
 
