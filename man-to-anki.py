@@ -5,6 +5,7 @@ import urllib.request
 import os.path
 import gzip
 import argparse
+import re
 
 import bs4
 
@@ -43,15 +44,19 @@ def get_user_one_liner() -> str:
 
 
 def get_one_liner(parsed_html: bs4.BeautifulSoup) -> str:
-    result: str = ""
     line: bs4.Tag | bs4.NavigableString | None = parsed_html.find("p")
     assert line is not bs4.NavigableString
     if line is None:
         return get_user_one_liner()
 
-    result = str(line.string)
-    result = result[result.index(" - ") + len(" - "):]
-    return first_letter_capitalize(result)
+    result: str = str(line.string)
+    substring: str = " - "
+    substring_index: int = result.find(substring)
+    if substring_index != -1:
+        result = result[substring_index + len(substring):]
+        return first_letter_capitalize(result)
+    else:
+        return get_user_one_liner()
 
 
 def get_option_dt(
