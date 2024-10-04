@@ -49,8 +49,13 @@ def get_one_liner(parsed_html: bs4.BeautifulSoup) -> str:
         return get_user_one_liner()
 
     result: str = str(line.string)
+    # Try to find either of two hyphen characters
     substring: str = " - "
     substring_index: int = result.find(substring)
+    if substring_index == -1:
+        substring = " — "
+        substring_index = result.find(substring)
+
     if substring_index != -1:
         result = result[substring_index + len(substring):]
         return first_letter_capitalize(result)
