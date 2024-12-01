@@ -3,8 +3,8 @@
 	"deck": "Parent::IT",
 
 	"hint-one-liner": "Unix command",
-	"tags-one-liner": ["Unix::Command"],
+	"tags-one-liner": ["IT::Unix::Command"],
 
 	"hint-option-description": "Unix {page} option",
-	"tags-option-description": ["Unix::Command::Option"]
+	"tags-option-description": ["IT::Unix::Command::Option"]
 }
