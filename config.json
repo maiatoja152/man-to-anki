@@ -1,6 +1,6 @@
 {
 	"anki-collection": "/home/jacob/anki-collection/",
-	"deck": "Parent",
+	"deck": "Parent::IT",
 
 	"hint-one-liner": "Unix command",
 	"tags-one-liner": ["Unix::Command"],
