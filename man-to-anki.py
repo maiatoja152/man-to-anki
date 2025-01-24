@@ -44,6 +44,13 @@ def get_args() -> argparse.Namespace:
         action="store_true",
         help="Indicate that this is a man page for a subcommand such as git-commit"
     )
+    parser.add_argument(
+        "-t",
+        "--tags",
+        type=str,
+        nargs=argparse.ONE_OR_MORE,
+        help="Additional tags to add to notes"
+    )
     return parser.parse_args()
 
 
@@ -224,7 +231,7 @@ def main() -> None:
             back=back,
             hint=hint,
             links=link,
-            tags=config["tags-one-liner"],
+            tags=config["tags-one-liner"] + args.tags,
         )
         print(f"Added one liner note ({note_id})"
             f"for the man page: {page}({section})")
@@ -252,7 +259,7 @@ def main() -> None:
                 back=title,
                 hint=hint,
                 links=link,
-                tags=config["tags-option-description"],
+                tags=config["tags-option-description"] + args.tags,
             )
             print(f"Added option description note ({note_id})"
                 f"for the man page: {page}({section})")
