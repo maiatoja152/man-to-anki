@@ -230,7 +230,7 @@ def main() -> None:
 
     if args.subcommand:
         # For example, turn "git-commit" into "git commit"
-        command: str = page.replace("-", " ")
+        command: str = page.replace("-", " ", 1)
     else:
         command: str = page
 
