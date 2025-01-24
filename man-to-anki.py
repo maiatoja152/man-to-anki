@@ -38,6 +38,11 @@ def get_args() -> argparse.Namespace:
         nargs=argparse.ONE_OR_MORE,
         help="Create flashcards for command options",
     )
+    parser.add_argument(
+        "--subcommand",
+        action="store_true",
+        help="Indicate that this is a man page for a subcommand such as git-commit"
+    )
     return parser.parse_args()
 
 
@@ -223,6 +228,12 @@ def main() -> None:
     print(f"Created (or updated) an html file for \
     {page}({section}) at: {man_html_file_path}")
 
+    if args.subcommand:
+        # For example, turn "git-commit" into "git commit"
+        command: str = page.replace("-", " ")
+    else:
+        command: str = page
+
     with open(man_html_file_path) as man_html_file:
         soup = bs4.BeautifulSoup(man_html_file, "html.parser")
 
@@ -231,11 +242,11 @@ def main() -> None:
     if args.description:
         note_id: int = add_description_note(
             get_one_liner(soup),
-            page,
+            command,
             source
         )
         print(f"Added one liner note ({note_id})"
-            "for the man page: {page}({section})")
+            f"for the man page: {command}({section})")
         note_ids.append(note_id)
 
     if args.option is not None:
@@ -245,9 +256,9 @@ def main() -> None:
             else:
                 option = "--" + option
             title, description = get_option_info(soup, option)
-            note_id = add_option_note(description, title, page, source)
+            note_id = add_option_note(description, title, command, source)
             print(f"Added option description note ({note_id})"
-                "for the man page: {page}({section})")
+                f"for the man page: {command}({section})")
             note_ids.append(note_id)
 
     if len(note_ids) > 0:
