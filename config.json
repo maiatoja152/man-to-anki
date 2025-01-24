@@ -1,5 +1,7 @@
 {
-	"anki-collection": "/home/jacob/anki-collection/",
+	"anki-connect-url": "http://localhost:8765",
+
+	"anki-collection": "/home/jacob/.local/share/Anki2/User 1/collection.media/",
 	"deck": "Parent::IT",
 
 	"hint-one-liner": "Unix command",
