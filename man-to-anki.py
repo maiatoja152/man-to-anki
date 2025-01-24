@@ -39,6 +39,7 @@ def get_args() -> argparse.Namespace:
         help="Create flashcards for command options",
     )
     parser.add_argument(
+        "-s",
         "--subcommand",
         action="store_true",
         help="Indicate that this is a man page for a subcommand such as git-commit"
@@ -127,7 +128,7 @@ def get_option_info(
     return (get_option_title(dt, option), get_option_description(dt, option))
 
 
-def create_man_html_file(section: int, page: str) -> str:
+def create_man_html_file(section: int, page: str) -> Path:
     """
     Create a file in the Anki collection containing an html conversion of a man
     page. If a file already exists for this page, it will be overwritten.
@@ -164,7 +165,7 @@ def add_note(
     front: str,
     back: str,
     hint: str,
-    source: str,
+    links: str,
     tags: list
 ) -> int:
     note = {
@@ -174,41 +175,12 @@ def add_note(
             "Front": front,
             "Back": back,
             "Hint": hint,
-            "Source": source,
+            "Links": links,
         },
         "tags": tags,
     }
     config = get_config()
     return invoke_anki_connect(config["anki-connect-url"], "addNote", note=note)
-
-
-def add_description_note(description: str, page: str, source: str) -> int:
-    config = get_config()
-    return add_note(
-        deck=config["deck"],
-        front=description,
-        back=page,
-        hint=config["hint-one-liner"],
-        source=source,
-        tags=config["tags-one-liner"],
-    )
-
-
-def add_option_note(
-        option_description: str,
-        option_title: str,
-        page: str,
-        source: str
-) -> int:
-    config = get_config()
-    return add_note(
-        deck=config["deck"],
-        front=option_description,
-        back=option_title,
-        hint=config["hint-option-description"].format(page=page),
-        source=source,
-        tags=config["tags-option-description"],
-    )
 
 
 def gui_browse_notes(note_ids: list[int]) -> list[int]:
@@ -220,33 +192,42 @@ def gui_browse_notes(note_ids: list[int]) -> list[int]:
 
 
 def main() -> None:
+    config = get_config()
     args: argparse.Namespace = get_args()
     page: str = args.page
     section: int = args.section
 
-    man_html_file_path: str = create_man_html_file(section, page)
+    html_filepath: Path = create_man_html_file(section, page)
     print(f"Created (or updated) an html file for \
-    {page}({section}) at: {man_html_file_path}")
+    {page}({section}) at: {html_filepath}")
 
     if args.subcommand:
         # For example, turn "git-commit" into "git commit"
-        command: str = page.replace("-", " ", 1)
-    else:
-        command: str = page
+        command, subcommand = page.split("-", 1)
 
-    with open(man_html_file_path) as man_html_file:
+    with open(html_filepath) as man_html_file:
         soup = bs4.BeautifulSoup(man_html_file, "html.parser")
 
-    source = Path(man_html_file_path).name
+    html_filename: str = str(Path(html_filepath).name)
+    link = f"<a href=\"{html_filename}\" title=\"{html_filename}\">Source</a>"
     note_ids: list[int] = []
     if args.description:
-        note_id: int = add_description_note(
-            get_one_liner(soup),
-            command,
-            source
+        if args.subcommand:
+            back = f"{command} {subcommand}"
+            hint = config["hint-subcommand-one-liner"].format(command=command)
+        else:
+            back = page
+            hint = config["hint-one-liner"]
+        note_id = add_note(
+            deck=config["deck"],
+            front=get_one_liner(soup),
+            back=back,
+            hint=hint,
+            links=link,
+            tags=config["tags-one-liner"],
         )
         print(f"Added one liner note ({note_id})"
-            f"for the man page: {command}({section})")
+            f"for the man page: {page}({section})")
         note_ids.append(note_id)
 
     if args.option is not None:
@@ -256,9 +237,25 @@ def main() -> None:
             else:
                 option = "--" + option
             title, description = get_option_info(soup, option)
-            note_id = add_option_note(description, title, command, source)
+            if args.subcommand:
+                hint = config["hint-subcommand-option-description"].format(
+                    command=command,
+                    subcommand=subcommand
+                )
+            else:
+                hint = config["hint-option-description"].format(
+                    page=page
+                )
+            note_id = add_note(
+                deck=config["deck"],
+                front=description,
+                back=title,
+                hint=hint,
+                links=link,
+                tags=config["tags-option-description"],
+            )
             print(f"Added option description note ({note_id})"
-                f"for the man page: {command}({section})")
+                f"for the man page: {page}({section})")
             note_ids.append(note_id)
 
     if len(note_ids) > 0:

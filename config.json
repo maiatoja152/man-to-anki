@@ -7,6 +7,10 @@
 	"hint-one-liner": "Unix command",
 	"tags-one-liner": ["IT::Unix::Command"],
 
+	"hint-subcommand-one-liner": "{command} command",
+
 	"hint-option-description": "Unix {page} option",
-	"tags-option-description": ["IT::Unix::Command::Option"]
+	"tags-option-description": ["IT::Unix::Command::Option"],
+
+	"hint-subcommand-option-description": "{command} {subcommand} option"
 }
