@@ -49,6 +49,7 @@ def get_args() -> argparse.Namespace:
         "--tags",
         type=str,
         nargs=argparse.ONE_OR_MORE,
+        default=[],
         help="Additional tags to add to notes"
     )
     return parser.parse_args()
