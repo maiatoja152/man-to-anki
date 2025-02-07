@@ -56,7 +56,7 @@ def get_args() -> argparse.Namespace:
 
 
 def get_config() -> dict[str, typing.Any]:
-    with open("config.json") as config_file:
+    with open(Path(__file__).parent / "config.json") as config_file:
         return json.load(config_file)
 
 
